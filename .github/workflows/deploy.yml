@@ -49,34 +49,27 @@ jobs:
         echo "- Docker: skpy1/ci-cd-app:${{ env.VERSION }}" >> CHANGELOG.md
         echo "✅ Changelog generated"
     
-    # 7. Styled Telegram notification
-    - name: Send Telegram Notification
+        # 7. Send Telegram notification with file attachment
+    - name: Send Telegram Notification with File
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         message: |
-          Проект: ci-cd-pipeline
-          Версия: ${{ env.VERSION }}
-          Дата: $(date +'%Y.%m.%d %H:%M:%S')
-          Автор: ${{ github.actor }}
-
-          Информация о Git-репозитории**
-          GIT COMMIT: ${{ github.sha }}
-          GIT TAG: v${{ env.VERSION }}
-
-          Информация о Docker-репозитории
+          🚀 **Новый выпуск изменений**
+          
+          **Проект**: ci-cd-pipeline
+          **Версия**: ${{ env.VERSION }}
+          **Дата**: $(date +'%Y.%m.%d %H:%M:%S')
+          
+          **Информация о Docker-репозитории**
           Владелец: skpy1
-          Название: ci-cd-app
+          Название: ci-cd-app  
           Тег: ${{ env.VERSION }}
-          Полное имя: skpy1/ci-cd-app:${{ env.VERSION }}
-
-          changelog.md
-          $(cat CHANGELOG.md | head -5)
-
-          Ссылки:
-          Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
-          GitHub: ${{ github.server_url }}/${{ github.repository }}
+          
+          📎 *changelog.md прикреплен к сообщению*
+        files: |
+          CHANGELOG.md
 
     # 8. Success message
     - name: Success
