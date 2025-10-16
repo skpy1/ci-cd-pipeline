@@ -12,33 +12,50 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - name: Verify files exist
+    - name: Debug files
       run: |
-        echo "📁 Files in repository:"
+        echo "=== DEBUG INFO ==="
+        echo "📁 All files:"
         ls -la
-        echo "📄 Dockerfile exists: $(test -f Dockerfile && echo 'YES' || echo 'NO')"
-        echo "📄 index.html exists: $(test -f index.html && echo 'YES' || echo 'NO')"
+        echo "📄 Dockerfile content:"
+        cat Dockerfile
+        echo "📄 index.html content:"
+        cat index.html
+        echo "=================="
     
     - name: Build Docker image
       run: |
-        docker build -t skpy1/ci-cd-app:latest -t skpy1/ci-cd-app:$(date +%s) .
-        echo "✅ Docker image built"
+        echo "🛠 Building Docker image..."
+        docker build -t skpy1/ci-cd-app:latest -t skpy1/ci-cd-app:test-$(date +%s) .
+        echo "✅ Build completed"
     
     - name: Login to Docker Hub
       run: |
-        docker login -u skpy1 -p ${{ secrets.DOCKERHUB_TOKEN }}
-        echo "✅ Logged in to Docker Hub"
+        echo "🔐 Logging into Docker Hub..."
+        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "skpy1" --password-stdin
+        echo "✅ Login result: $?"
+    
+    - name: Debug Docker images
+      run: |
+        echo "🐳 Available Docker images:"
+        docker images | grep skpy1 || echo "❌ No skpy1 images found"
+        echo "🔍 Docker Hub status:"
+        docker system df
     
     - name: Push to Docker Hub
       run: |
+        echo "🚀 Pushing to Docker Hub..."
         docker push skpy1/ci-cd-app:latest
-        echo "✅ Image pushed to Docker Hub"
+        echo "✅ Push result: $?"
         
-    - name: List Docker images
+    - name: Verify push
       run: |
-        docker images | grep skpy1
+        echo "🔍 Verifying push..."
+        docker pull skpy1/ci-cd-app:latest
+        echo "✅ Pull result: $?"
     
-    - name: Success
+    - name: Final check
       run: |
-        echo "🎉 CI/CD Pipeline completed successfully!"
-        echo "🐳 Check Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app"
+        echo "🎯 FINAL STATUS:"
+        echo "Docker images built: $(docker images | grep skpy1 | wc -l)"
+        echo "Pipeline completed at: $(date)"
