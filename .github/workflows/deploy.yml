@@ -47,14 +47,23 @@ jobs:
         echo "- Commit: $GITHUB_SHA" >> CHANGELOG.md
         echo "✅ Changelog generated"
     
-    # 7. Simulated Telegram notification
-    - name: Telegram Notification
-      run: |
-        echo "📱 Telegram notification simulated"
-        echo "Bot Token: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && '✅ SET' || '❌ NOT SET' }}"
-        echo "Chat ID: ${{ secrets.TELEGRAM_CHAT_ID != '' && '✅ SET' || '❌ NOT SET' }}"
-        echo "📦 Docker Image: skpy1/ci-cd-app:${{ env.VERSION }}"
-        echo "🔗 Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app"
+    # 7. Real Telegram notification
+    - name: Send Telegram Notification
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          🚀 CI/CD Deployment Successful!
+          
+          📦 Docker Image: skpy1/ci-cd-app:${{ env.VERSION }}
+          🏠 Repository: ${{ github.repository }}
+          ⏰ Time: $(date)
+          
+          🔗 Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
+          🔗 GitHub Actions: ${{ github.server_url }}/${{ github.repository }}/actions
+          
+          ✅ All checks passed!
     
     # 8. Simulated GitHub Release
     - name: Simulate GitHub Release
