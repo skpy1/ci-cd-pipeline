@@ -73,16 +73,16 @@ jobs:
           Тег: ${{ env.VERSION }}
           Полное имя: skpy1/ci-cd-app:${{ env.VERSION }}
 
-          changelog.md
-
-           **Содержимое changelog.md**
-          ```
-          $(cat CHANGELOG.md)
-          ```
-
           Ссылки:
-          - Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
-          - GitHub: ${{ github.server_url }}/${{ github.repository }}
+          Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
+          GitHub: ${{ github.server_url }}/${{ github.repository }}
+
+    - name: Send Telegram File
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: "📎 changelog.md:"
         files: |
           CHANGELOG.md
 
