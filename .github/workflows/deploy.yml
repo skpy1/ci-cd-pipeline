@@ -40,19 +40,17 @@ jobs:
         docker push skpy1/ci-cd-app:${{ env.VERSION }}
         echo "✅ Images pushed to Docker Hub"
     
-    # 6. Generate changelog
+    # 6. Generate changelog (FIXED)
     - name: Generate changelog
       run: |
         echo "📝 Generating changelog..."
-        cat > CHANGELOG.md << EOF
-# Changelog
-## Version ${{ env.VERSION }}
-- Build date: ${{ env.BUILD_DATE }}
-- Commit: ${{ github.sha }}
-- Author: ${{ github.actor }}
-- Docker: skpy1/ci-cd-app:${{ env.VERSION }}
-- GitHub: ${{ github.server_url }}/${{ github.repository }}
-EOF
+        echo "# Changelog" > CHANGELOG.md
+        echo "## Version ${{ env.VERSION }}" >> CHANGELOG.md
+        echo "- Build date: ${{ env.BUILD_DATE }}" >> CHANGELOG.md
+        echo "- Commit: ${{ github.sha }}" >> CHANGELOG.md
+        echo "- Author: ${{ github.actor }}" >> CHANGELOG.md
+        echo "- Docker: skpy1/ci-cd-app:${{ env.VERSION }}" >> CHANGELOG.md
+        echo "- GitHub: ${{ github.server_url }}/${{ github.repository }}" >> CHANGELOG.md
         echo "✅ Changelog generated"
         echo "📄 Content:"
         cat CHANGELOG.md
@@ -61,7 +59,7 @@ EOF
     - name: Verify changelog
       run: |
         echo "🔍 Final file check:"
-        ls -la CHANGELOG.md || echo "❌ FILE NOT FOUND"
+        ls -la CHANGELOG.md
         echo "📄 Final content:"
         cat CHANGELOG.md
     
