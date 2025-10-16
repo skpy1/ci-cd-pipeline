@@ -1,7 +1,0 @@
-version: '3.8'
-services:
-  ci-cd-app:
-    image: skpy1/ci-cd-app:latest
-    ports:
-      - "8080:80"
-    restart: unless-stopped
