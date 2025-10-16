@@ -75,6 +75,11 @@ jobs:
 
           changelog.md
 
+           **Содержимое changelog.md**
+          ```
+          $(cat CHANGELOG.md)
+          ```
+
           Ссылки:
           - Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
           - GitHub: ${{ github.server_url }}/${{ github.repository }}
