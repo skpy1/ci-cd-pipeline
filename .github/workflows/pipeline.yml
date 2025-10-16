@@ -39,8 +39,8 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-app:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/ci-cd-app:${{ env.VERSION }}
+          ${{ secrets.skpy1 }}/ci-cd-app:latest
+          ${{ secrets.skpy1 }}/ci-cd-app:${{ env.VERSION }}
     
     - name: Send Telegram notification
       uses: appleboy/telegram-action@master
