@@ -12,10 +12,20 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
     
+    - name: Debug - List all files
+      run: |
+        echo "📁 Current directory:"
+        pwd
+        echo "📋 All files:"
+        ls -la
+        echo "📄 Dockerfile content:"
+        cat Dockerfile || echo "❌ Dockerfile not found!"
+        echo "📄 index.html content:"
+        cat index.html || echo "❌ index.html not found!"
+    
     - name: Setup variables
       run: |
         echo "VERSION=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-        echo "Version: $VERSION"
     
     - name: Build Docker image
       run: |
@@ -29,25 +39,12 @@ jobs:
       run: |
         docker push skpy1/ci-cd-app:latest
         docker push skpy1/ci-cd-app:$VERSION
-        echo "✅ Docker image pushed successfully!"
     
-    - name: Create GitHub Release
+    - name: Create Release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v$VERSION
         release_name: Release v$VERSION
-        body: |
-          Automated CI/CD Release
-          - Version: $VERSION
-          - Docker: skpy1/ci-cd-app:$VERSION
-          - Date: $(date)
-        draft: false
-        prerelease: false
-    
-    - name: Success
-      run: |
-        echo "🚀 Pipeline completed successfully!"
-        echo "📦 Docker: skpy1/ci-cd-app:$VERSION"
-        echo "🎯 Release: v$VERSION"
+        body: "Automated release v$VERSION"
