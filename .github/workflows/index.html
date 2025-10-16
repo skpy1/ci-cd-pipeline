@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CI/CD Pipeline пересдача</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; }
+        .version { 
+            background: #3498db; 
+            color: white; 
+            padding: 5px 10px; 
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CI/CD Pipeline пересдача</h1>
+        <p>Тест пайплайна</p>
+        
+        <h2>📋 Функциональность:</h2>
+        <ul>
+            <li>Автоматическая сборка Docker образа</li>
+            <li>Публикация в Docker Hub</li>
+            <li>Уведомления в Telegram</li>
+            <li>Автоматическое создание релизов</li>
+        </ul>
+        
+        <h2>Технологии</h2>
+        <ul>
+            <li>GitHub Actions</li>
+            <li>Docker</li>
+            <li>Nginx</li>
+            <li>Telegram Bot API</li>
+        </ul>
+        
+        <div class="version">Version: {{VERSION}}</div>
+        <p><small>Build date: {{BUILD_DATE}}</small></p>
+    </div>
+</body>
+</html>
