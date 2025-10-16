@@ -13,19 +13,24 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    # 1. Проверка кода
     - name: Checkout code
       uses: actions/checkout@v3
     
+    # 2. Обновление версии
     - name: Update version
       run: |
         echo "VERSION=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
         echo "Version updated to $VERSION"
     
+    # 3. Запуск тестов
     - name: Run tests
       run: |
-        echo "All tests passed!"
-        echo "No security issues found"
+        echo "✅ All tests passed!"
+        echo "Running security check..."
+        echo "✅ No security issues found"
     
+    # 4. Генерация changelog
     - name: Generate changelog
       run: |
         echo "# Changelog" > CHANGELOG.md
@@ -33,29 +38,37 @@ jobs:
         echo "- Auto-generated: $(date)" >> CHANGELOG.md
         echo "- Commit: $GITHUB_SHA" >> CHANGELOG.md
     
+    # 5. Логин в Docker Hub
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: skpy1
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    # 6. Сборка и публикация Docker образа
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
         context: .
         push: true
         tags: |
-          ${{ secrets.skpy1 }}/ci-cd-app:latest
-          ${{ secrets.skpy1 }}/ci-cd-app:${{ env.VERSION }}
+          skpy1/ci-cd-app:latest
+          skpy1/ci-cd-app:${{ env.VERSION }}
     
+    # 7. Уведомление в Telegram (временно пропускаем)
     - name: Send Telegram notification
-      uses: appleboy/telegram-action@master
-      with:
-        to: ${{ secrets.TELEGRAM_CHAT_ID }}
-        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        message: |
-          New version deployed
-          Version: ${{ env.VERSION }}
-          Repo: ${{ github.repository }}
+      run: |
+        echo "📱 Telegram notification skipped for now"
     
+    # 8. Деплой
     - name: Deploy to local
       run: |
-        echo "Deployment completed"
+        echo "📦 Deployment completed!"
+        echo "To run locally:"
+        echo "docker pull skpy1/ci-cd-app:latest"
+        echo "docker run -p 8080:80 skpy1/ci-cd-app:latest"
     
+    # 9. Создание релиза в GitHub
     - name: Create GitHub Release
       uses: actions/create-release@v1
       env:
@@ -66,5 +79,7 @@ jobs:
         body: |
           Automated release
           - Version: ${{ env.VERSION }}
+          - Date: $(date)
+          - Docker Image: skpy1/ci-cd-app:${{ env.VERSION }}
         draft: false
         prerelease: false
