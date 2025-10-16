@@ -17,7 +17,9 @@ jobs:
     - name: Setup variables
       run: |
         echo "VERSION=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+        echo "BUILD_DATE=$(date +'%Y.%m.%d %H:%M:%S')" >> $GITHUB_ENV
         echo "🕐 Version: $VERSION"
+        echo "📅 Build date: $BUILD_DATE"
     
     # 3. Build Docker image
     - name: Build Docker image
@@ -43,7 +45,7 @@ jobs:
       run: |
         echo "# Changelog" > CHANGELOG.md
         echo "## Version ${{ env.VERSION }}" >> CHANGELOG.md
-        echo "- Build date: $(date +'%Y.%m.%d %H:%M:%S')" >> CHANGELOG.md
+        echo "- Build date: ${{ env.BUILD_DATE }}" >> CHANGELOG.md
         echo "- Commit: $GITHUB_SHA" >> CHANGELOG.md
         echo "- Author: ${{ github.actor }}" >> CHANGELOG.md
         echo "- Docker: skpy1/ci-cd-app:${{ env.VERSION }}" >> CHANGELOG.md
@@ -60,7 +62,7 @@ jobs:
           
           **Проект**: ci-cd-pipeline
           **Версия**: ${{ env.VERSION }}
-          **Дата**: $(date +'%Y.%m.%d %H:%M:%S')
+          **Дата**: ${{ env.BUILD_DATE }}
           **Автор**: ${{ github.actor }}
 
           **Информация о Git-репозитории**
@@ -85,4 +87,6 @@ jobs:
     - name: Success
       run: |
         echo "🎉 CI/CD Pipeline completed successfully!"
+        echo "🐳 Docker: skpy1/ci-cd-app:${{ env.VERSION }}"
         echo "📱 Telegram: Notification with file sent"
+        echo "📝 Changelog: Generated and sent"
