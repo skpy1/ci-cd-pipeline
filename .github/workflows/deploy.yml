@@ -44,13 +44,13 @@ jobs:
       run: |
         echo "Generating changelog..."
         echo "# Changelog" > CHANGELOG.md
-        echo "## Version ${{ env.VERSION }}" >> CHANGELOG.md
-        echo "- Build date: ${{ env.BUILD_DATE }}" >> CHANGELOG.md
-        echo "- Commit: ${{ github.sha }}" >> CHANGELOG.md
-        echo "- Author: ${{ github.actor }}" >> CHANGELOG.md
-        echo "- Docker: skpy1/ci-cd-app:${{ env.VERSION }}" >> CHANGELOG.md
-        echo "- GitHub: ${{ github.server_url }}/${{ github.repository }}" >> CHANGELOG.md
-        echo "Changelog generated"
+        echo "## Version $VERSION" >> CHANGELOG.md
+        echo "- Build date: $BUILD_DATE" >> CHANGELOG.md
+        echo "- Commit: $GITHUB_SHA" >> CHANGELOG.md
+        echo "- Author: $GITHUB_ACTOR" >> CHANGELOG.md
+        echo "- Docker: skpy1/ci-cd-app:$VERSION" >> CHANGELOG.md
+        echo "- GitHub: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY" >> CHANGELOG.md
+        echo "hangelog generated"
         echo "Content:"
         cat CHANGELOG.md
     
