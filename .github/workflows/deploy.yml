@@ -1,61 +1,129 @@
-name: Deploy to Docker Hub
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [closed]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
+    # 1. Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - name: Debug files
+    # 2. Setup variables
+    - name: Setup variables
       run: |
-        echo "=== DEBUG INFO ==="
-        echo "📁 All files:"
-        ls -la
-        echo "📄 Dockerfile content:"
-        cat Dockerfile
-        echo "📄 index.html content:"
-        cat index.html
-        echo "=================="
+        echo "VERSION=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+        echo "🕐 Version: $VERSION"
     
+    # 3. Verify files
+    - name: Verify files
+      run: |
+        echo "📁 Repository structure:"
+        ls -la
+        echo "✅ All files verified"
+    
+    # 4. Build Docker image
     - name: Build Docker image
       run: |
-        echo "🛠 Building Docker image..."
-        docker build -t skpy1/ci-cd-app:latest -t skpy1/ci-cd-app:test-$(date +%s) .
-        echo "✅ Build completed"
+        docker build -t skpy1/ci-cd-app:latest -t skpy1/ci-cd-app:${{ env.VERSION }} .
+        echo "✅ Docker image built"
     
+    # 5. Login to Docker Hub
     - name: Login to Docker Hub
       run: |
-        echo "🔐 Logging into Docker Hub..."
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "skpy1" --password-stdin
-        echo "✅ Login result: $?"
+        echo "✅ Logged in to Docker Hub"
     
-    - name: Debug Docker images
-      run: |
-        echo "🐳 Available Docker images:"
-        docker images | grep skpy1 || echo "❌ No skpy1 images found"
-        echo "🔍 Docker Hub status:"
-        docker system df
-    
+    # 6. Push to Docker Hub
     - name: Push to Docker Hub
       run: |
-        echo "🚀 Pushing to Docker Hub..."
         docker push skpy1/ci-cd-app:latest
-        echo "✅ Push result: $?"
-        
-    - name: Verify push
-      run: |
-        echo "🔍 Verifying push..."
-        docker pull skpy1/ci-cd-app:latest
-        echo "✅ Pull result: $?"
+        docker push skpy1/ci-cd-app:${{ env.VERSION }}
+        echo "✅ Images pushed to Docker Hub"
     
-    - name: Final check
+    # 7. Generate changelog
+    - name: Generate changelog
       run: |
-        echo "🎯 FINAL STATUS:"
-        echo "Docker images built: $(docker images | grep skpy1 | wc -l)"
-        echo "Pipeline completed at: $(date)"
+        echo "# Changelog" > CHANGELOG.md
+        echo "## Version ${{ env.VERSION }}" >> CHANGELOG.md
+        echo "- Build date: $(date)" >> CHANGELOG.md
+        echo "- Commit: $GITHUB_SHA" >> CHANGELOG.md
+        echo "✅ Changelog generated"
+    
+    # 8. Send Telegram notification
+    - name: Send Telegram notification
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          🚀 New CI/CD Deployment!
+          
+          ✅ Version: ${{ env.VERSION }}
+          📦 Docker: skpy1/ci-cd-app:latest
+          🏠 Repository: ${{ github.repository }}
+          📊 Trigger: ${{ github.event_name }}
+          
+          🔗 Links:
+          - Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
+          - GitHub: ${{ github.server_url }}/${{ github.repository }}
+          
+          🎉 Deployment completed successfully!
+      if: success()
+
+    # 9. Telegram notification on failure
+    - name: Send Telegram notification (Failure)
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          ❌ CI/CD Pipeline Failed!
+          
+          🏠 Repository: ${{ github.repository }}
+          📊 Trigger: ${{ github.event_name }}
+          🔗 Workflow: ${{ github.server_url }}/${{ github.repository }}/actions
+          
+          ⚠️ Check the logs for details
+      if: failure()
+
+    # 10. Create GitHub Release
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ env.VERSION }}
+        release_name: Release v${{ env.VERSION }}
+        body: |
+          ## Automated CI/CD Release
+          
+          **Version:** ${{ env.VERSION }}
+          **Docker Image:** skpy1/ci-cd-app:${{ env.VERSION }}
+          **Build Date:** $(date)
+          
+          ### Changes:
+          - Automated deployment
+          - Docker image updated
+          - Changelog generated
+          
+          ### Links:
+          - [Docker Hub](https://hub.docker.com/r/skpy1/ci-cd-app)
+          - [View Changes](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+        draft: false
+        prerelease: false
+
+    # 11. Success message
+    - name: Success
+      run: |
+        echo "🎉 CI/CD Pipeline completed successfully!"
+        echo "🐳 Docker: skpy1/ci-cd-app:${{ env.VERSION }}"
+        echo "📱 Telegram: Notification sent"
+        echo "🏷️ Release: v${{ env.VERSION }} created"
