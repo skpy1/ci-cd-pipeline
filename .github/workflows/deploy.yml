@@ -16,26 +16,29 @@ jobs:
       run: |
         echo "📁 Files in repository:"
         ls -la
-        echo "📄 Dockerfile content:"
-        cat Dockerfile
-        echo "✅ All files are present"
+        echo "📄 Dockerfile exists: $(test -f Dockerfile && echo 'YES' || echo 'NO')"
+        echo "📄 index.html exists: $(test -f index.html && echo 'YES' || echo 'NO')"
     
     - name: Build Docker image
       run: |
-        docker build -t skpy1/ci-cd-app:latest .
+        docker build -t skpy1/ci-cd-app:latest -t skpy1/ci-cd-app:$(date +%s) .
         echo "✅ Docker image built"
     
     - name: Login to Docker Hub
       run: |
-        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "skpy1" --password-stdin
+        docker login -u skpy1 -p ${{ secrets.DOCKERHUB_TOKEN }}
         echo "✅ Logged in to Docker Hub"
     
     - name: Push to Docker Hub
       run: |
         docker push skpy1/ci-cd-app:latest
         echo "✅ Image pushed to Docker Hub"
+        
+    - name: List Docker images
+      run: |
+        docker images | grep skpy1
     
     - name: Success
       run: |
         echo "🎉 CI/CD Pipeline completed successfully!"
-        echo "🐳 Docker image: skpy1/ci-cd-app:latest"
+        echo "🐳 Check Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app"
