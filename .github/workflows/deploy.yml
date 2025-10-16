@@ -9,41 +9,40 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # 1. Checkout code
     - name: Checkout code
       uses: actions/checkout@v3
-      
-    # 2. Setup variables
+
+
     - name: Setup variables
       run: |
         echo "VERSION=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
         echo "BUILD_DATE=$(date +'%Y.%m.%d %H:%M:%S')" >> $GITHUB_ENV
-        echo "🕐 Version: $VERSION"
-        echo "📅 Build date: $BUILD_DATE"
+        echo "Version: $VERSION"
+        echo "Build date: $BUILD_DATE"
     
-    # 3. Build Docker image
+
     - name: Build Docker image
       run: |
         docker build -t skpy1/ci-cd-app:latest -t skpy1/ci-cd-app:${{ env.VERSION }} .
-        echo "✅ Docker image built"
+        echo "Docker image built"
     
-    # 4. Login to Docker Hub
+
     - name: Login to Docker Hub
       run: |
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "skpy1" --password-stdin
-        echo "✅ Logged in to Docker Hub"
+        echo "Logged in to Docker Hub"
     
-    # 5. Push to Docker Hub
+
     - name: Push to Docker Hub
       run: |
         docker push skpy1/ci-cd-app:latest
         docker push skpy1/ci-cd-app:${{ env.VERSION }}
-        echo "✅ Images pushed to Docker Hub"
+        echo "Images pushed to Docker Hub"
     
-    # 6. Generate changelog (FIXED)
+
     - name: Generate changelog
       run: |
-        echo "📝 Generating changelog..."
+        echo "Generating changelog..."
         echo "# Changelog" > CHANGELOG.md
         echo "## Version ${{ env.VERSION }}" >> CHANGELOG.md
         echo "- Build date: ${{ env.BUILD_DATE }}" >> CHANGELOG.md
@@ -51,11 +50,11 @@ jobs:
         echo "- Author: ${{ github.actor }}" >> CHANGELOG.md
         echo "- Docker: skpy1/ci-cd-app:${{ env.VERSION }}" >> CHANGELOG.md
         echo "- GitHub: ${{ github.server_url }}/${{ github.repository }}" >> CHANGELOG.md
-        echo "✅ Changelog generated"
-        echo "📄 Content:"
+        echo "Changelog generated"
+        echo "Content:"
         cat CHANGELOG.md
     
-    # 7. Verify changelog
+
     - name: Verify changelog
       run: |
         echo "🔍 Final file check:"
@@ -63,33 +62,32 @@ jobs:
         echo "📄 Final content:"
         cat CHANGELOG.md
     
-    # 8. Telegram notification
+
     - name: Send Telegram Notification
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         message: |
-          🚀 **Новый выпуск изменений**
           
-          **Проект**: ci-cd-pipeline
-          **Версия**: ${{ env.VERSION }}
-          **Дата**: ${{ env.BUILD_DATE }}
-          **Автор**: ${{ github.actor }}
+          Проект: ci-cd-pipeline
+          Версия: ${{ env.VERSION }}
+          Дата: ${{ env.BUILD_DATE }}
+          Автор: ${{ github.actor }}
 
-          **Информация о Docker-репозитории**
+          Информация о Docker-репозитории:
           skpy1/ci-cd-app:${{ env.VERSION }}
 
-          📎 *changelog.md создан и сохранен в репозитории*
+          changelog.md создан и сохранен в репозитории
 
-          🔗 **Ссылки:**
+          Ссылки:
           - Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app
           - GitHub: ${{ github.server_url }}/${{ github.repository }}
         files: |
           CHANGELOG.md
 
-    # 9. Success message
+
     - name: Success
       run: |
-        echo "🎉 CI/CD Pipeline completed successfully!"
-        echo "📁 CHANGELOG.md: $(test -f CHANGELOG.md && echo '✅ CREATED' || echo '❌ MISSING')"
+        echo "CI/CD Pipeline completed successfully!"
+        echo "CHANGELOG.md: $(test -f CHANGELOG.md && echo '✅ CREATED' || echo '❌ MISSING')"
