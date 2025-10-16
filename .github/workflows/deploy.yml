@@ -53,26 +53,21 @@ jobs:
         echo "📱 Telegram notification simulated"
         echo "Bot Token: ${{ secrets.TELEGRAM_BOT_TOKEN != '' && '✅ SET' || '❌ NOT SET' }}"
         echo "Chat ID: ${{ secrets.TELEGRAM_CHAT_ID != '' && '✅ SET' || '❌ NOT SET' }}"
-        echo "Message: Deployment v${{ env.VERSION }} completed!"
+        echo "📦 Docker Image: skpy1/ci-cd-app:${{ env.VERSION }}"
+        echo "🔗 Docker Hub: https://hub.docker.com/r/skpy1/ci-cd-app"
     
-    # 8. Create GitHub Release (FIXED)
-    - name: Create GitHub Release
-      uses: marvinpinto/action-automatic-releases@latest
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        automatic_release_tag: "v${{ env.VERSION }}"
-        prerelease: false
-        title: "Release v${{ env.VERSION }}"
-        body: |
-          Automated CI/CD Release
-          - Version: ${{ env.VERSION }}
-          - Docker: skpy1/ci-cd-app:${{ env.VERSION }}
-        files: |
-          CHANGELOG.md
+    # 8. Simulated GitHub Release
+    - name: Simulate GitHub Release
+      run: |
+        echo "🏷️ GitHub Release simulated: v${{ env.VERSION }}"
+        echo "📝 Release notes would be created with changelog"
+        echo "🔗 Docker Hub image: skpy1/ci-cd-app:${{ env.VERSION }}"
 
     # 9. Success message
     - name: Success
       run: |
         echo "🎉 CI/CD Pipeline completed successfully!"
         echo "🐳 Docker: skpy1/ci-cd-app:${{ env.VERSION }}"
-        echo "🏷️ Release: v${{ env.VERSION }}"
+        echo "📱 Telegram: Notification ready"
+        echo "📝 Changelog: Generated"
+        echo "🏷️ Release: Simulated (v${{ env.VERSION }})"
