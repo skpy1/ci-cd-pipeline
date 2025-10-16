@@ -81,7 +81,7 @@ jobs:
 
     - name: Success
       run: |
-        echo "🎉 CI/CD Pipeline completed successfully!"
-        echo "🐳 Docker: skpy1/ci-cd-app:${{ env.VERSION }}"
-        echo "📱 Telegram: Notification with file sent"
-        echo "📝 Changelog: Generated and sent"
+        echo "CI/CD Pipeline completed successfully!"
+        echo "Docker: skpy1/ci-cd-app:${{ env.VERSION }}"
+        echo "Telegram: Notification with file sent"
+        echo "Changelog: Generated and sent"
